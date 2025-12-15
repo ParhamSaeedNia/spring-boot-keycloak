@@ -73,9 +73,14 @@ spring:
    - `USER` role
 
 5. **Create users** and assign roles:
-   - Create a user (e.g., `testuser`)
-   - Set a password
-   - Assign roles: `USER` or `ADMIN`
+   - Go to **Users** → **Add user**
+   - **Username**: `testuser` (or any username)
+   - Click **Create**
+   - Go to **Credentials** tab → Set password
+   - **Important**: Toggle **Temporary** to **OFF** (so password is not temporary)
+   - Go to **Role Mappings** tab → Assign realm roles: `USER` or `ADMIN`
+   - In **Details** tab: Make sure **Enabled** is **ON**
+   - In **Required Actions** tab: Remove any required actions (like "Verify Email")
 
 ## API Endpoints
 
@@ -184,6 +189,57 @@ This error occurs when:
 - Go to your client settings in Keycloak
 - Enable "Direct Access Grants" toggle
 - Save the changes
+
+### Error: "Account is not fully set up" or "invalid_grant"
+
+This error occurs when the user account has required actions that need to be completed.
+
+**Solution**:
+
+1. **Access Keycloak Admin Console**:
+   - Go to `http://localhost:8080/admin`
+   - Login with admin credentials
+   - Select the `demo-realm` realm
+
+2. **Find and Edit the User**:
+   - Go to **Users** → Search for `admin` (or your username)
+   - Click on the user to edit
+
+3. **Check Required Actions**:
+   - Go to the **Required Actions** tab
+   - **Remove all required actions** (like "Verify Email", "Update Password", etc.)
+   - Or mark them as completed
+
+4. **Verify User Settings**:
+   - Go to the **Credentials** tab
+   - Make sure the user has a password set
+   - If needed, set/reset the password
+   - Toggle **Temporary** to **OFF** (so password is not temporary)
+
+5. **Check Account Status**:
+   - Go to the **Details** tab
+   - Make sure **Email Verified** is **ON** (or disable email verification requirement)
+   - Make sure **Enabled** is **ON**
+
+6. **Alternative: Create a New User**:
+   - Go to **Users** → **Add user**
+   - **Username**: `testuser`
+   - **Email**: (optional)
+   - Click **Create**
+   - Go to **Credentials** tab → Set password
+   - Toggle **Temporary** to **OFF**
+   - Go to **Role Mappings** → Assign roles (USER or ADMIN)
+   - Make sure **Enabled** is **ON** in the **Details** tab
+
+7. **Test with the properly configured user**:
+   ```bash
+   curl -X POST http://localhost:8080/realms/demo-realm/protocol/openid-connect/token \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "client_id=spring-boot-app" \
+     -d "username=testuser" \
+     -d "password=your-password" \
+     -d "grant_type=password"
+   ```
 
 ## Testing the API
 
